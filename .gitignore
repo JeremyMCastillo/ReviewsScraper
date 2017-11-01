@@ -1,2 +1,4 @@
 *.config
 proxy_list
+asin_list
+data/

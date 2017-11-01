@@ -1,0 +1,4 @@
+ASINLIST="./asin_list"
+OUTPUTDIR="data"
+WAITSTART=2
+WAITEND=10
