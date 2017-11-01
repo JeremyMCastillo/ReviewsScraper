@@ -1,0 +1,2 @@
+#!/bin/sh
+curl -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36" -o x3.html https://www.amazon.com/product-reviews/B003PPGOC0/ref=cm_cr_dp_d_show_all_top?ie=UTF8&reviewerType=all_reviews
