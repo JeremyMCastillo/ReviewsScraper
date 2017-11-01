@@ -1,0 +1,1 @@
+< B004WP0KWW.html scrape -b -e '.review-text' | xml2json | jq '.'
