@@ -1,1 +1,2 @@
 < B004WP0KWW.html scrape -b -e '.review-text' | xml2json | jq '.'
+< B004WP0LE4.html scrape -b -e 'div.review > div.celwidget' | xml2json | jq '.html.body | {title: .div[].div[0].a[1]."$t"}'
