@@ -6,7 +6,7 @@ echo "Starting crawl"
 while read asin 
 do
 	echo "Downloading ASIN: $asin"
-	curl -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36" -o "$OUTPUTDIR/$asin.html" "https://www.amazon.com/product-reviews/$asin/ref=cm_cr_dp_d_show_all_top?ie=UTF8&reviewerType=all_reviews"
+	curl -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36"  "https://www.amazon.com/product-reviews/$asin/ref=cm_cr_dp_d_show_all_top?ie=UTF8&reviewerType=all_reviews" |  scrape -b -e 'div.review > div.celwidget' | xml2json | jq '.html.body.div[] | {title: .div[0].a[1]."$t", date: .div[1].span[3]."$t", author: .div[1].span[0].a."$t", rating: .div[0].a[0].i.span."$t", body: .div[3].span."$t"}' > $OUTPUTDIR/$asin.json
 	waitperiod=$(shuf -i $WAITSTART-$WAITEND -n 1)
 	echo "Sleeping for $waitperiod seconds"
 	sleep $waitperiod
