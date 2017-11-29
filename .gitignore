@@ -3,3 +3,5 @@ proxy_list
 asin_list
 data/
 walmart_list
+api/node_modules/
+api/*.log
