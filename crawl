@@ -3,15 +3,20 @@ echo "Reading config file"
 . ./crawl.config
 mkdir -p $OUTPUTDIR
 echo "Starting crawl"
+total=$(wc -l asin_list | awk '{print $1}')
+count=0
 while read asin 
 do
 	echo "Downloading ASIN for reviews: $asin"
+	progress=$(bc -l <<< ''$count'/'$total'*100')
+	echo "Progress: $progress%"
+	count=$((count + 1))
 
 	# Begin by downloading HTML
 	curl -H "$USERAGENT" "https://www.amazon.com/product-reviews/$asin/ref=cm_cr_dp_d_show_all_top?ie=UTF8&reviewerType=all_reviews" |
 
 	# Save out html file for future use and pass stdout to next tool
- 	tee $OUTPUTDIR/$asin.html |
+ 	tee $OUTPUTDIR/$asin.reviewdata.html |
 
 	# Scrape out celwidget elements, which contain the useful Reviews information
   	scrape -b -e 'div.review > div.celwidget' |
@@ -23,11 +28,11 @@ do
 	jq -c 'if (.html.body.div | type) == "object" then (.html.body.div) else (.html.body.div[]) end | {title: .div[0].a[1]."$t", date: .div[1].span[3]."$t", author: .div[1].span[0].a."$t", rating: .div[0].a[0].i.span."$t", body: .div[3].span."$t", asin: "'$asin'"}' |
 
 	# Save out json file for future use and pass stdout to next tool
- 	tee $OUTPUTDIR/$asin.json |
+ 	tee $OUTPUTDIR/$asin.reviewdata.json |
 
 	# Convert jq json output to csv and output to file
 	json2csv -p -k=title,date,author,rating,body,asin \
-	> $OUTPUTDIR/$asin.csv
+	> $OUTPUTDIR/$asin.reviewdata.csv
 
 	# Be nice to Amazon's servers
 	waitperiod=$(shuf -i $WAITSTART-$WAITEND -n 1)
@@ -50,13 +55,13 @@ do
  	xml2json |
 
 	# Using jq to format single level json formats for easy processing
-	jq -c 'if (.html.body.div | type) == "object" then (.html.body.div) else (.html.body.div[]) end | {price: (.div[7].div.div.table | ( if (.tr | type) == "object" then (.tr.td[1].span[0]."$t") else (.tr[1].td[1].span[0]."$t") end)), asin: "'$asin'"}' |
+	jq -c 'if (.html.body.div | type) == "object" then (.html.body.div) else (.html.body.div[]) end | {price: (.div[7].div.div.table | ( if (.tr | type) == "object" then (.tr.td[1].span[0]."$t") else (.tr[1].td[1].span[0]."$t") end)), rating_avg: .div[2].div.span[0].span.span[0].a.i[0].span."$t", rating_count: .div[2].div.span[2].a.span."$t", asin: "'$asin'"}' |
 
 	# Save out json file for future use and pass stdout to next tool
  	tee $OUTPUTDIR/$asin.prodinfo.json |
 
 	# Convert jq json output to csv and output to file
-	json2csv -p -k=price,asin \
+	json2csv -p -k=price,asin,rating_count,rating_avg \
 	> $OUTPUTDIR/$asin.prodinfo.csv
 
 	# Be nice to Amazon's servers

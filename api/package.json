@@ -4,13 +4,16 @@
   "description": "A REST API used to configure and communicate with the ReviewsScraper service",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon -L -e js index.js"
   },
   "author": "Jeremy Castillo",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "csvtojson": "^1.1.9",
     "express": "^4.16.2",
+    "fs-extra": "^5.0.0",
     "lodash": "^4.17.4"
   }
 }
